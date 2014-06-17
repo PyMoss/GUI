@@ -1,6 +1,15 @@
-from Tkinter import *
-import ttk
-import tkFileDialog as FileDialog
+from tkinter import *
+try:
+    # for Python2
+    from Tkinter import *
+    import ttk as ttk
+    import FileDialog as FileDialog
+except ImportError:
+    # for Python3
+    from tkinter import *
+    import tkinter.ttk as ttk
+    import tkinter.filedialog as FileDialog
+
 #from Tkinter import FileDialog
 
 root = Tk()
@@ -17,7 +26,7 @@ name = ttk.Entry(content)
 def openfilename():
     filename = FileDialog.askopenfilename()
     f = open(filename)
-    print f.read()
+    #print f.read()
 
 def saveasfilename():
     FileDialog.asksaveasfilename()
