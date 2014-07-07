@@ -98,3 +98,103 @@ content.columnconfigure(4, weight=1)
 content.rowconfigure(1, weight=1)
 
 root.mainloop()
+content = ttk.Frame(root)
+toolbar = ttk.Frame(content, borderwidth=5, relief="groove")
+LeftFrame = ttk.Frame(content, borderwidth=5, relief="groove", width=50, height=500)
+RightFrame = ttk.Frame(content, borderwidth=5, relief="groove", width=400, height=100)
+namelbl = ttk.Label(LeftFrame, text="Name") #Textbox_label
+menubar = Menu(root) #Menubar
+name = ttk.Entry(LeftFrame) #Textbox
+
+def openfilename():
+    filename = FileDialog.askopenfilename(filetypes=[("ASCII Files","*.csv"),("All Files", "*")])
+    print filename
+    f = open(filename)
+    #print f.read()
+    Label(RightFrame, text=filename).pack()
+
+def saveasfilename():
+    FileDialog.asksaveasfilename()
+    
+def close():
+   root.destroy()
+   
+def donothing():
+    print "Hello World"
+
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="New", command=donothing)
+filemenu.add_command(label="Open", command=openfilename)
+filemenu.add_command(label="Save", command=saveasfilename)
+filemenu.add_command(label="Save as...", command=saveasfilename)
+filemenu.add_command(label="Close", command=close)
+filemenu.add_separator()
+filemenu.add_command(label="Exit", command=close)
+
+menubar.add_cascade(label="File", menu=filemenu)
+editmenu = Menu(menubar, tearoff=0)
+editmenu.add_command(label="Undo", command=donothing)
+
+editmenu.add_separator()
+
+editmenu.add_command(label="Cut", command=donothing)
+editmenu.add_command(label="Copy", command=donothing)
+editmenu.add_command(label="Paste", command=donothing)
+editmenu.add_command(label="Delete", command=donothing)
+editmenu.add_command(label="Select All", command=donothing)
+
+menubar.add_cascade(label="Edit", menu=editmenu)
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label="Help Index", command=donothing)
+helpmenu.add_command(label="About...", command=donothing)
+menubar.add_cascade(label="Help", menu=helpmenu)
+root.config(menu=menubar)
+
+b = Button(toolbar, text="New", width=6, relief=FLAT, justify=LEFT, command=donothing)
+b.pack()
+
+c = Button(toolbar, text="Open", width=6, relief=FLAT, justify=LEFT, command=donothing)
+c.pack()
+
+onevar = BooleanVar()
+twovar = BooleanVar()
+threevar = BooleanVar()
+
+onevar.set(True)
+twovar.set(False)
+threevar.set(True)
+
+one = ttk.Checkbutton(content, text="One", variable=onevar, onvalue=True)
+two = ttk.Checkbutton(content, text="Two", variable=twovar, onvalue=True)
+three = ttk.Checkbutton(content, text="Three", variable=threevar, onvalue=True)
+ok = ttk.Button(LeftFrame, text="Okay")
+cancel = ttk.Button(LeftFrame, text="Cancel")
+
+content.grid(column=0, row=0, sticky=(N, S, E, W))
+toolbar.grid(column=0, row=0, columnspan=5, sticky=(N, S, E, W))
+b.grid(column=0, row=0, sticky=W)
+c.grid(column=1, row=0, sticky=W)
+LeftFrame.grid(column=0, row=1, columnspan=2, rowspan=2, sticky=(N, S, E, W))
+RightFrame.grid(column=2, row=1, columnspan=3, rowspan=2, sticky=(N, S, E, W))
+namelbl.grid(column=0, row=1, sticky=(N, W), padx=5)
+name.grid(column=1, row=1, sticky=(N, E, W), pady=5, padx=5)
+one.grid(column=2, row=3)
+two.grid(column=3, row=3)
+three.grid(column=4, row=3)
+ok.grid(column=0, row=3)
+cancel.grid(column=1, row=3)
+
+#frame.Label(root, text=openfilename(filecontent))
+
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+content.columnconfigure(0, weight=1)
+content.columnconfigure(1, weight=1)
+content.columnconfigure(2, weight=4)
+content.columnconfigure(3, weight=4)
+content.columnconfigure(4, weight=4)
+content.rowconfigure(1, weight=1)
+
+root.state("zoomed")
+
+root.mainloop()
