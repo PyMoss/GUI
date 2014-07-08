@@ -17,87 +17,6 @@ root.wm_iconbitmap("favicon.ico")
 root.title("PyMoss")
 root.geometry("800x600+10+10")
 
-content = ttk.Frame(root, padding=(3,3,12,12))
-frame = ttk.Frame(content, borderwidth=5, relief="sunken", width=200, height=100)
-namelbl = ttk.Label(content, text="Name")
-menubar = Menu(root)
-name = ttk.Entry(content)
-
-def openfilename():
-    filename = FileDialog.askopenfilename()
-    f = open(filename)
-    #print f.read()
-
-def saveasfilename():
-    FileDialog.asksaveasfilename()
-    
-def donothing():
-   filewin = Toplevel(root)
-   button = Button(filewin, text="Do nothing button")
-   button.pack()
-
-filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="New", command=donothing)
-filemenu.add_command(label="Open", command=openfilename)
-filemenu.add_command(label="Save", command=saveasfilename)
-filemenu.add_command(label="Save as...", command=saveasfilename)
-filemenu.add_command(label="Close", command=donothing)
-filemenu.add_separator()
-filemenu.add_command(label="Exit", command=root.quit)
-
-menubar.add_cascade(label="File", menu=filemenu)
-editmenu = Menu(menubar, tearoff=0)
-editmenu.add_command(label="Undo", command=donothing)
-
-editmenu.add_separator()
-
-editmenu.add_command(label="Cut", command=donothing)
-editmenu.add_command(label="Copy", command=donothing)
-editmenu.add_command(label="Paste", command=donothing)
-editmenu.add_command(label="Delete", command=donothing)
-editmenu.add_command(label="Select All", command=donothing)
-
-menubar.add_cascade(label="Edit", menu=editmenu)
-helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="Help Index", command=donothing)
-helpmenu.add_command(label="About...", command=donothing)
-menubar.add_cascade(label="Help", menu=helpmenu)
-root.config(menu=menubar)
-
-onevar = BooleanVar()
-twovar = BooleanVar()
-threevar = BooleanVar()
-
-onevar.set(True)
-twovar.set(False)
-threevar.set(True)
-
-one = ttk.Checkbutton(content, text="One", variable=onevar, onvalue=True)
-two = ttk.Checkbutton(content, text="Two", variable=twovar, onvalue=True)
-three = ttk.Checkbutton(content, text="Three", variable=threevar, onvalue=True)
-ok = ttk.Button(content, text="Okay")
-cancel = ttk.Button(content, text="Cancel")
-
-content.grid(column=0, row=0, sticky=(N, S, E, W))
-frame.grid(column=0, row=0, columnspan=3, rowspan=2, sticky=(N, S, E, W))
-namelbl.grid(column=3, row=0, columnspan=2, sticky=(N, W), padx=5)
-name.grid(column=3, row=1, columnspan=2, sticky=(N, E, W), pady=5, padx=5)
-one.grid(column=0, row=3)
-two.grid(column=1, row=3)
-three.grid(column=2, row=3)
-ok.grid(column=3, row=3)
-cancel.grid(column=4, row=3)
-
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
-content.columnconfigure(0, weight=3)
-content.columnconfigure(1, weight=3)
-content.columnconfigure(2, weight=3)
-content.columnconfigure(3, weight=1)
-content.columnconfigure(4, weight=1)
-content.rowconfigure(1, weight=1)
-
-root.mainloop()
 content = ttk.Frame(root)
 toolbar = ttk.Frame(content, borderwidth=5, relief="groove")
 LeftFrame = ttk.Frame(content, borderwidth=5, relief="groove", width=50, height=500)
@@ -150,11 +69,35 @@ helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 root.config(menu=menubar)
 
-b = Button(toolbar, text="New", width=6, relief=FLAT, justify=LEFT, command=donothing)
-b.pack()
+open = Image.open("open.png")
+open_img = ImageTk.PhotoImage(open)
+a = Button(toolbar, image=open_img, relief=FLAT, justify=LEFT, command=donothing)
+a.image = open_img
+a.grid()
 
-c = Button(toolbar, text="Open", width=6, relief=FLAT, justify=LEFT, command=donothing)
-c.pack()
+save = Image.open("save.png")
+save_img = ImageTk.PhotoImage(save)
+b = Button(toolbar, image=save_img, relief=FLAT, justify=LEFT, command=donothing)
+b.image = save_img
+b.grid()
+
+save_as = Image.open("save_as.png")
+save_as_img = ImageTk.PhotoImage(save_as)
+c = Button(toolbar, image=save_as_img, relief=FLAT, justify=LEFT, command=donothing)
+c.image = save_as_img
+c.grid()
+
+zoom_in = Image.open("zoom_in.png")
+zoom_in_img = ImageTk.PhotoImage(zoom_in)
+d = Button(toolbar, image=zoom_in_img, relief=FLAT, justify=LEFT, command=donothing)
+d.image = zoom_in_img
+d.grid()
+
+zoom_out = Image.open("zoom_out.png")
+zoom_out_img = ImageTk.PhotoImage(zoom_out)
+e = Button(toolbar, image=zoom_out_img, relief=FLAT, justify=LEFT, command=donothing)
+e.image = zoom_out_img
+e.grid()
 
 onevar = BooleanVar()
 twovar = BooleanVar()
@@ -172,8 +115,12 @@ cancel = ttk.Button(LeftFrame, text="Cancel")
 
 content.grid(column=0, row=0, sticky=(N, S, E, W))
 toolbar.grid(column=0, row=0, columnspan=5, sticky=(N, S, E, W))
-b.grid(column=0, row=0, sticky=W)
-c.grid(column=1, row=0, sticky=W)
+a.grid(column=0, row=0, padx=5, sticky=W)
+b.grid(column=1, row=0, padx=5, sticky=W)
+c.grid(column=2, row=0, padx=5, sticky=W)
+d.grid(column=3, row=0, padx=5, sticky=W)
+e.grid(column=4, row=0, padx=5, sticky=W)
+
 LeftFrame.grid(column=0, row=1, columnspan=2, rowspan=2, sticky=(N, S, E, W))
 RightFrame.grid(column=2, row=1, columnspan=3, rowspan=2, sticky=(N, S, E, W))
 namelbl.grid(column=0, row=1, sticky=(N, W), padx=5)
@@ -198,3 +145,4 @@ content.rowconfigure(1, weight=1)
 root.state("zoomed")
 
 root.mainloop()
+
