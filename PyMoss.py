@@ -24,7 +24,7 @@ ax.tick_params(axis='both', which='minor', labelsize=8)
 ax.set_xlabel('Channels', fontsize=8)
 ax.set_ylabel('Intensity', fontsize=8)
 
-# Zooming function -------------------------------------------------------------------------------------
+# Zooming Class : This class zooms the particular region selected---------------------------------------
 class Zoom(object):
     def __init__(self):      
         self.is_pressed = False
@@ -52,13 +52,10 @@ class Zoom(object):
         self.is_pressed = True
         if event.xdata is not None and event.ydata is not None:
             self.x0, self.y0 = event.xdata, event.ydata
-            #print('press:', self.x0, self.y0)
-            # only remove old rectangle
             self.rect.set_width(0)
             self.rect.set_height(0)
             self.rect.set_xy((self.x0, self.y0))
             self.ax.figure.canvas.draw()
-            # color and linestyle for future motion 
             self.rect.set_facecolor('red')
             self.rect.set_linestyle('dashed')
 
@@ -70,33 +67,23 @@ class Zoom(object):
                 self.rect.set_height(self.y1 - self.y0)
                 self.rect.set_xy((self.x0, self.y0))
                 self.ax.figure.canvas.draw()
-                #print('rect:', self.x0, self.y0, self.x1, self.y1, (self.x1-self.x0), (self.y1-self.y0))
 
     def on_release(self, event):
         self.is_pressed = False
-        #print('release:', event.xdata, event.ydata)
-
-        # change only color and linestyle
-        #self.rect.set_width(self.x1 - self.x0)
-        #self.rect.set_height(self.y1 - self.y0)
-        #self.rect.set_xy((self.x0, self.y0))
         RightFrame.config(cursor="arrow")
         self.rect.set_facecolor('blue')
         self.rect.set_linestyle('solid')
-        #self.ax.figure.canvas.draw()
         if self.x0 > self.x1:
             if self.y0 > self.y1:
                 self.minX = self.x1
                 self.maxX = self.x0
                 self.minY = self.y1
                 self.maxY = self.y0
-                #print('x0>x1 & y0>y1')
             else:
                 self.minX = self.x1
                 self.maxX = self.x0
                 self.minY = self.y0
                 self.maxY = self.y1
-                #print('x0>x1 & y0<y1')
         
         if self.x0 < self.x1:
             if self.y0 < self.y1:
@@ -104,13 +91,11 @@ class Zoom(object):
                 self.maxX = self.x1
                 self.minY = self.y0
                 self.maxY = self.y1
-                #print('x0<x1 & y0<y1')
             else:
                 self.minX = self.x0
                 self.maxX = self.x1
                 self.minY = self.y1
                 self.maxY = self.y0
-                #print('x0<x1 & y0>y1')
             
         global minX, minY, maxX, maxY
         minX = self.minX
@@ -131,256 +116,55 @@ my_object = Zoom()
 def zoom_init(x, y):
     RightFrame.config(cursor="crosshair")
     my_object.zoom_init(x, y)
-# UI Part------------------------------------------------------------------------------------------------------
+    
+# Class Data: This class collects the data for curve fitting------------------------------------------------------------
 class Data(object):
     def __init__(self): 
-        self.LF_1 = LabelFrame(frame, text="Curve 1 :", padx=5, pady=5)
-        self.LF_1.grid(padx=10, pady=10)
-        self.LF_hwhm_1 = ttk.Label(self.LF_1, text="HWHM :")
-        self.LF_hwhm_1.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_1 = ttk.Entry(self.LF_1)
-        self.LF_hwhm_entry_1.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_1 = ttk.Label(self.LF_1, text="Center :")
-        self.LF_center_1.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_1 = ttk.Entry(self.LF_1)
-        self.LF_center_entry_1.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_1 = ttk.Label(self.LF_1, text="Intensity :")
-        self.LF_intensity_1.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_1 = ttk.Entry(self.LF_1)
-        self.LF_intensity_entry_1.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_2 = LabelFrame(frame, text="Curve 2 :", padx=5, pady=5)
-        self.LF_2.grid(padx=10, pady=10)
-        self.LF_hwhm_2 = ttk.Label(self.LF_2, text="HWHM :")
-        self.LF_hwhm_2.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_2 = ttk.Entry(self.LF_2)
-        self.LF_hwhm_entry_2.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_2 = ttk.Label(self.LF_2, text="Center :")
-        self.LF_center_2.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_2 = ttk.Entry(self.LF_2)
-        self.LF_center_entry_2.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_2 = ttk.Label(self.LF_2, text="Intensity :")
-        self.LF_intensity_2.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_2 = ttk.Entry(self.LF_2)
-        self.LF_intensity_entry_2.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_3 = LabelFrame(frame, text="Curve 3 :", padx=5, pady=5)
-        self.LF_3.grid(padx=10, pady=10)
-        self.LF_hwhm_3 = ttk.Label(self.LF_3, text="HWHM :")
-        self.LF_hwhm_3.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_3 = ttk.Entry(self.LF_3)
-        self.LF_hwhm_entry_3.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_3 = ttk.Label(self.LF_3, text="Center :")
-        self.LF_center_3.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_3 = ttk.Entry(self.LF_3)
-        self.LF_center_entry_3.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_3 = ttk.Label(self.LF_3, text="Intensity :")
-        self.LF_intensity_3.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_3 = ttk.Entry(self.LF_3)
-        self.LF_intensity_entry_3.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_4 = LabelFrame(frame, text="Curve 4 :", padx=5, pady=5)
-        self.LF_4.grid(padx=10, pady=10)
-        self.LF_hwhm_4 = ttk.Label(self.LF_4, text="HWHM :")
-        self.LF_hwhm_4.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_4 = ttk.Entry(self.LF_4)
-        self.LF_hwhm_entry_4.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_4 = ttk.Label(self.LF_4, text="Center :")
-        self.LF_center_4.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_4 = ttk.Entry(self.LF_4)
-        self.LF_center_entry_4.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_4 = ttk.Label(self.LF_4, text="Intensity :")
-        self.LF_intensity_4.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_4 = ttk.Entry(self.LF_4)
-        self.LF_intensity_entry_4.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_5 = LabelFrame(frame, text="Curve 5 :", padx=5, pady=5)
-        self.LF_5.grid(padx=10, pady=10)
-        self.LF_hwhm_5 = ttk.Label(self.LF_5, text="HWHM :")
-        self.LF_hwhm_5.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_5 = ttk.Entry(self.LF_5)
-        self.LF_hwhm_entry_5.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_5 = ttk.Label(self.LF_5, text="Center :")
-        self.LF_center_5.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_5 = ttk.Entry(self.LF_5)
-        self.LF_center_entry_5.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_5 = ttk.Label(self.LF_5, text="Intensity :")
-        self.LF_intensity_5.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_5 = ttk.Entry(self.LF_5)
-        self.LF_intensity_entry_5.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_6 = LabelFrame(frame, text="Curve 6 :", padx=5, pady=5)
-        self.LF_6.grid(padx=10, pady=10)
-        self.LF_hwhm_6 = ttk.Label(self.LF_6, text="HWHM :")
-        self.LF_hwhm_6.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_6 = ttk.Entry(self.LF_6)
-        self.LF_hwhm_entry_6.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_6 = ttk.Label(self.LF_6, text="Center :")
-        self.LF_center_6.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_6 = ttk.Entry(self.LF_6)
-        self.LF_center_entry_6.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_6 = ttk.Label(self.LF_6, text="Intensity :")
-        self.LF_intensity_6.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_6 = ttk.Entry(self.LF_6)
-        self.LF_intensity_entry_6.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_7 = LabelFrame(frame, text="Curve 7 :", padx=5, pady=5)
-        self.LF_7.grid(padx=10, pady=10)
-        self.LF_hwhm_7 = ttk.Label(self.LF_7, text="HWHM :")
-        self.LF_hwhm_7.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_7 = ttk.Entry(self.LF_7)
-        self.LF_hwhm_entry_7.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_7 = ttk.Label(self.LF_7, text="Center :")
-        self.LF_center_7.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_7 = ttk.Entry(self.LF_7)
-        self.LF_center_entry_7.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_7 = ttk.Label(self.LF_7, text="Intensity :")
-        self.LF_intensity_7.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_7 = ttk.Entry(self.LF_7)
-        self.LF_intensity_entry_7.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_8 = LabelFrame(frame, text="Curve 8 :", padx=5, pady=5)
-        self.LF_8.grid(padx=10, pady=10)
-        self.LF_hwhm_8 = ttk.Label(self.LF_8, text="HWHM :")
-        self.LF_hwhm_8.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_8 = ttk.Entry(self.LF_8)
-        self.LF_hwhm_entry_8.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_8 = ttk.Label(self.LF_8, text="Center :")
-        self.LF_center_8.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_8 = ttk.Entry(self.LF_8)
-        self.LF_center_entry_8.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_8 = ttk.Label(self.LF_8, text="Intensity :")
-        self.LF_intensity_8.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_8 = ttk.Entry(self.LF_8)
-        self.LF_intensity_entry_8.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_9 = LabelFrame(frame, text="Curve 9 :", padx=5, pady=5)
-        self.LF_9.grid(padx=10, pady=10)
-        self.LF_hwhm_9 = ttk.Label(self.LF_9, text="HWHM :")
-        self.LF_hwhm_9.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_9 = ttk.Entry(self.LF_9)
-        self.LF_hwhm_entry_9.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_9 = ttk.Label(self.LF_9, text="Center :")
-        self.LF_center_9.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_9 = ttk.Entry(self.LF_9)
-        self.LF_center_entry_9.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_9 = ttk.Label(self.LF_9, text="Intensity :")
-        self.LF_intensity_9.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_9 = ttk.Entry(self.LF_9)
-        self.LF_intensity_entry_9.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_10 = LabelFrame(frame, text="Curve 10 :", padx=5, pady=5)
-        self.LF_10.grid(padx=10, pady=10)
-        self.LF_hwhm_10 = ttk.Label(self.LF_10, text="HWHM :")
-        self.LF_hwhm_10.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_10 = ttk.Entry(self.LF_10)
-        self.LF_hwhm_entry_10.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_10 = ttk.Label(self.LF_10, text="Center :")
-        self.LF_center_10.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_10 = ttk.Entry(self.LF_10)
-        self.LF_center_entry_10.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_10 = ttk.Label(self.LF_10, text="Intensity :")
-        self.LF_intensity_10.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_10 = ttk.Entry(self.LF_10)
-        self.LF_intensity_entry_10.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
-        self.LF_11 = LabelFrame(frame, text="Curve 11 :", padx=5, pady=5)
-        self.LF_11.grid(padx=10, pady=10)
-        self.LF_hwhm_11 = ttk.Label(self.LF_11, text="HWHM :")
-        self.LF_hwhm_11.grid(column=0, row=0, sticky=(N, S, E, W))
-        self.LF_hwhm_entry_11 = ttk.Entry(self.LF_11)
-        self.LF_hwhm_entry_11.grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
-        self.LF_center_11 = ttk.Label(self.LF_11, text="Center :")
-        self.LF_center_11.grid(column=0, row=1, sticky=(N, S, E, W))
-        self.LF_center_entry_11 = ttk.Entry(self.LF_11)
-        self.LF_center_entry_11.grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
-        self.LF_intensity_11 = ttk.Label(self.LF_11, text="Intensity :")
-        self.LF_intensity_11.grid(column=0, row=2, sticky=(N, S, E, W))
-        self.LF_intensity_entry_11 = ttk.Entry(self.LF_11)
-        self.LF_intensity_entry_11.grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
+        count = int(1)
+        self.LF = {}
+        self.LF_hwhm = {}
+        self.LF_hwhm_entry = {}
+        self.LF_center = {}
+        self.LF_center_entry = {}
+        self.LF_intensity = {}
+        self.LF_intensity_entry = {}
+        while(count < 12):
+          self.LF[count] = LabelFrame(frame, text="Curve " + str(count) + " :", padx=5, pady=5)
+          self.LF[count].grid(padx=10, pady=10)
+          print(self.LF[count])
+          self.LF_hwhm[count] = ttk.Label(self.LF[count], text="HWHM :")
+          self.LF_hwhm[count].grid(column=0, row=0, sticky=(N, S, E, W))
+          self.LF_hwhm_entry[count] = ttk.Entry(self.LF[count])
+          self.LF_hwhm_entry[count].grid(column=1, pady=5, row=0, sticky=(N, S, E, W))
+          self.LF_center[count] = ttk.Label(self.LF[count], text="Center :")
+          self.LF_center[count].grid(column=0, row=1, sticky=(N, S, E, W))
+          self.LF_center_entry[count] = ttk.Entry(self.LF[count])
+          self.LF_center_entry[count].grid(column=1, row=1, pady=5, sticky=(N, S, E, W))
+          self.LF_intensity[count] = ttk.Label(self.LF[count], text="Intensity :")
+          self.LF_intensity[count].grid(column=0, row=2, sticky=(N, S, E, W))
+          self.LF_intensity_entry[count] = ttk.Entry(self.LF[count])
+          self.LF_intensity_entry[count].grid(column=1, row=2,pady=5, sticky=(N, S, E, W))
+          count = count + 1
         
     def fetchdata(self):
         self.curve = []
-        self.hwhm_1 = self.LF_hwhm_entry_1.get()
-        self.center_1 = self.LF_center_entry_1.get()
-        self.intensity_1 = self.LF_intensity_entry_1.get()
-        if self.hwhm_1.strip() != '' and self.center_1.strip() != '' and self.intensity_1.strip() != '':
-            self.curve.append(float(self.hwhm_1))
-            self.curve.append(float(self.center_1))
-            self.curve.append(float(self.intensity_1))
-        
-        self.hwhm_2 = self.LF_hwhm_entry_2.get()
-        self.center_2 = self.LF_center_entry_2.get()
-        self.intensity_2 = self.LF_intensity_entry_2.get()
-        if self.hwhm_2.strip() != '' and self.center_2.strip() != '' and self.intensity_2.strip() != '':
-            self.curve.append(float(self.hwhm_2)) 
-            self.curve.append(float(self.center_2)) 
-            self.curve.append(float(self.intensity_2))
-
-        self.hwhm_3 = self.LF_hwhm_entry_3.get()
-        self.center_3 = self.LF_center_entry_3.get()
-        self.intensity_3 = self.LF_intensity_entry_3.get()
-        if self.hwhm_3.strip() != '' and self.center_3.strip() != '' and self.intensity_3.strip() != '':
-            self.curve.append(float(self.hwhm_3))
-            self.curve.append(float(self.center_3))
-            self.curve.append(float(self.intensity_3))
-        
-        self.hwhm_4 = self.LF_hwhm_entry_4.get()
-        self.center_4 = self.LF_center_entry_4.get()
-        self.intensity_4 = self.LF_intensity_entry_4.get()
-        if self.hwhm_4.strip() != '' and self.center_4.strip() != '' and self.intensity_4.strip() != '':
-            self.curve.append(float(self.hwhm_4))
-            self.curve.append(float(self.center_4))
-            self.curve.append(float(self.intensity_4))
-        
-        self.hwhm_5 = self.LF_hwhm_entry_5.get()
-        self.center_5 = self.LF_center_entry_5.get()
-        self.intensity_5 = self.LF_intensity_entry_5.get()
-        if self.hwhm_5.strip() != '' and self.center_5.strip() != '' and self.intensity_5.strip() != '':
-            self.curve.append(float(self.hwhm_5))
-            self.curve.append(float(self.center_5))
-            self.curve.append(float(self.intensity_5))
-        
-        self.hwhm_6 = self.LF_hwhm_entry_6.get()
-        self.center_6 = self.LF_center_entry_6.get()
-        self.intensity_6 = self.LF_intensity_entry_6.get()
-        if self.hwhm_6.strip() != '' and self.center_6.strip() != '' and self.intensity_6.strip() != '':
-            self.curve.append(float(self.hwhm_6))
-            self.curve.append(float(self.center_6))
-            self.curve.append(float(self.intensity_6))
-        
-        self.hwhm_7 = self.LF_hwhm_entry_7.get()
-        self.center_7 = self.LF_center_entry_7.get()
-        self.intensity_7 = self.LF_intensity_entry_7.get()
-        if self.hwhm_7.strip() != '' and self.center_7.strip() != '' and self.intensity_7.strip() != '':
-            self.curve.append(float(self.hwhm_7))
-            self.curve.append(float(self.center_7))
-            self.curve.append(float(self.intensity_7))
-
-        self.hwhm_8 = self.LF_hwhm_entry_8.get()
-        self.center_8 = self.LF_center_entry_8.get()
-        self.intensity_8 = self.LF_intensity_entry_8.get()
-        if self.hwhm_8.strip() != '' and self.center_8.strip() != '' and self.intensity_8.strip() != '':
-            self.curve.append(float(self.hwhm_8))
-            self.curve.append(float(self.center_8))
-            self.curve.append(float(self.intensity_8))
-
-        self.hwhm_9 = self.LF_hwhm_entry_9.get()
-        self.center_9 = self.LF_center_entry_9.get()
-        self.intensity_9 = self.LF_intensity_entry_9.get()
-        if self.hwhm_9.strip() != '' and self.center_9.strip() != '' and self.intensity_9.strip() != '':
-            self.curve.append(float(self.hwhm_9))
-            self.curve.append(float(self.center_9))
-            self.curve.append(float(self.intensity_9))
-
-        self.hwhm_10 = self.LF_hwhm_entry_10.get()
-        self.center_10 = self.LF_center_entry_10.get()
-        self.intensity_10 = self.LF_intensity_entry_10.get()
-        if self.hwhm_10.strip() != '' and self.center_10.strip() != '' and self.intensity_10.strip() != '':
-            self.curve.append(float(self.hwhm_10))
-            self.curve.append(float(self.center_10))
-            self.curve.append(float(self.intensity_10)) 
-
-        self.hwhm_11 = self.LF_hwhm_entry_11.get()
-        self.center_11 = self.LF_center_entry_11.get()
-        self.intensity_11 = self.LF_intensity_entry_11.get()
-        if self.hwhm_11.strip() != '' and self.center_11.strip() != '' and self.intensity_11.strip() != '':
-            self.curve.append(float(self.hwhm_11))
-            self.curve.append(float(self.center_11))
-            self.curve.append(float(self.intensity_11))
+        self.hwhm = {}
+        self.center = {}
+        self.intensity = {}
+        count = int(1)
+        while(count < 12):
+          self.hwhm[count] = self.LF_hwhm_entry[count].get()
+          self.center[count] = self.LF_center_entry[count].get()
+          self.intensity[count] = self.LF_intensity_entry[count].get()
+          if self.hwhm[count].strip() != '' and self.center[count].strip() != '' and self.intensity[count].strip() != '':
+            self.curve.append(float(self.hwhm[count]))
+            self.curve.append(float(self.center[count]))
+            self.curve.append(float(self.intensity[count]))
+          count = count + 1
+    
         fit_curve(self.curve)
         
-        
+# This function adds a scrollbar for a frame widget
 def myfunction(event):
     LF_canvas.configure(scrollregion=LF_canvas.bbox("all"),width=220,height=600)
 
@@ -414,9 +198,8 @@ LF_canvas.create_window((0,0),window=frame,anchor='nw')
 frame.bind("<Configure>",myfunction)
     
 mish = Data()
-
-# Backend------------------------------------------------------------------------
 RightFrame = ttk.Frame(content, borderwidth=5, relief="groove", width=750)
+
 def dataReducer(data, reductionlevel):
     #Checks to see if amount of data is divisible by the reducion level. If not then this method will not work
     if len(data) % reductionlevel != 0:
@@ -431,12 +214,14 @@ def dataReducer(data, reductionlevel):
         q+=reductionlevel
     out=np.array(new)
     return out
+
 #This function takes the data and performs folding to remove a parabolic baseline.
 def dataFolder(data, foldingpoint):
     newfold = []
     for i in range(0,len(data)//2):
         newfold.append(data[i]+data[len(data)-i-1])
     return newfold
+
 #This function coverts the X axis to velocity and returns the new values.
 def dataVelocity(data,zeroPoint,rate):
     pos = []
@@ -447,6 +232,7 @@ def dataVelocity(data,zeroPoint,rate):
         neg.append((i)*rate)
     newVelocitycityMatrix = np.append(neg,pos)
     return newVelocitycityMatrix
+
 #This function is wrapper for plotting.  
 def mossplot(datain,xval,title="Mossbauer Spectrum",xaxis="Velocity (mm/s)",yaxis="Counts"):
     fig = ax.plot(xval,datain)
@@ -457,25 +243,30 @@ def mossplot(datain,xval,title="Mossbauer Spectrum",xaxis="Velocity (mm/s)",yaxi
     ax.ylabel(yaxis)
     ax.xlim(min(xval),max(xval))
     return
+
 #This function calculates Doppler effect from velocity as an input and resonance energy
 def dopplerEffect (velocity,resonanceEnergy):
     c=2.997924588E8
     eDoppler= (1+velocity)*resonanceEnergy/c
     return eDoppler
+
 #This function calculates effective mossbauer thickness -- not to be implemented for a long time
 def effectiveThickness (LMfactor,cross,abundance,density,thickness,molarmass):
     N=6.022E23
     result= LMfactor*N*abundance*density*thickness/molarmass
+    
 #The parameters for Lorentzian fits.
 def lorentzian(x,hwhm,cent,intense,back=0):
     numerator =  (hwhm**2 )
     denominator = ( x - (cent) )**2 + hwhm**2
     y = intense*(numerator/denominator)+back
     return y
+
 #Residual function for fitting.
 def residuals(p,y,x):
     err = y - lorentzian(x,p)
     return err
+
 #Residual function for fitting multiple curves.
 def multipleResiduals(p,x,yval):
     parin= np.zeros(len(x))
@@ -488,7 +279,7 @@ def multipleResiduals(p,x,yval):
         parin=np.add(parin,lorentzian(x,p0,p1,p2))
     err = yval - parin
     return err
-#END SECTION: Functions
+
 #Input parameters ideally not hard coded, but for testing and dev they will be.
 filename = "TPNIOF14forwmoss.dat" #Test Data Path - Go Through GUI
 data = []
@@ -497,7 +288,6 @@ redNumber=4
 channels=1024
 midpoint= 512//redNumber
 passionbeat="fit"
-#End input parameters
 data = dataFolder(data,channels)
 new = dataReducer(data,redNumber)
 newVelocity = dataVelocity(new,midpoint,16/channels*redNumber)
@@ -509,9 +299,7 @@ ind_bg_mid=(newVelocity > -8) & (newVelocity < 8)
 m, c = np.polyfit(x_bg, y_bg, 1)
 background = m*newVelocity + c
 y_bg_corr = new - background
-#These are the test values for parameters to be fitted.
-#It should be able to accept an unlimited number.
-#It is set for 12 sets of parameters. It needs to be able to do 1,2,5,6,12
+
 def fit_curve(input_data):
     p = input_data
     global graph, canvas, ax, passionbeat
@@ -519,7 +307,6 @@ def fit_curve(input_data):
     nb.select(0)
     graph = Figure(figsize=(5,4), dpi=150)
     ax = graph.add_subplot(111)
-    #p = [0.34,-0.2,-800,0.34,-0.15,-750,0.34,0.11,-500,0.34,-0.25,-888,0.34,-0.2,-800,0.34,-0.15,-750,0.34,0.11,-500,0.34,-0.25,-888,0.34,-0.2,-800,0.34,-0.15,-750,0.34,0.11,-500,0.34,-0.25,-888]  # [hwhm, peak center, intensity] #
     pBest = scipy.optimize.leastsq(multipleResiduals,p,args=(newVelocity[ind_bg_mid],y_bg_corr[ind_bg_mid]),full_output=1)
     fitsum=np.zeros(len(newVelocity))
     for i in range(0,len(pBest[0][:]),3):
@@ -616,6 +403,7 @@ def plotgraph():
 
 def zoom_out():
     RightFrame.config(cursor="arrow")
+    
 # Tooltip function ------------------------------------------------------------------------------------------
 class ToolTipManager:
     label = None
@@ -729,7 +517,7 @@ helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 root.config(menu=menubar)
 
-# Toolbar
+# Toolbar------------------------------------------------------------------------------------------
 toolbar = ttk.Frame(content, borderwidth=5, relief="groove")
 open_icon = Image.open("open.png")
 open_img = ImageTk.PhotoImage(open_icon)
@@ -761,6 +549,7 @@ plot_icon_img = ImageTk.PhotoImage(plot_icon)
 f = Button(toolbar, image=plot_icon_img, relief=FLAT, justify=LEFT, command=plotgraph)
 f.image = plot_icon_img
 
+# For Tooltip---------------------------------------------------------------------------------------------
 register(a, "Open")
 register(b, "Save Image")
 register(c, "Zoom in (Only available for Data Plotting)")
@@ -769,6 +558,7 @@ register(e, "Fit Curve")
 register(f, "PLot")
 register(text, "Open or Paste a .csv file and click Plot")
 
+# Geometry--------------------------------------------------------------------------------------------------
 content.grid(column=0, row=0, sticky=(N, S, E, W))
 toolbar.grid(column=0, row=0, columnspan=5, sticky=(N, S, E, W))
 a.grid(column=0, row=0, padx=5, sticky=W)
