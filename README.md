@@ -3,4 +3,4 @@ GUI
 
 The User Interface of PyMoss
 
-Hello, We are using Tkinter, ttk, PyLab & matplotlib library to build this awesome Software
+PyMoss was developed using Tkinter, ttk, PyLab, SciPy, NumPy & Matplotlib library.
